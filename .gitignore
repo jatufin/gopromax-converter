@@ -1,0 +1,20 @@
+# Byte-compiled
+__pycache__/
+*.py[cod]
+*\$py.class
+
+# Data directory
+data/
+
+# Environmental variables for development
+.env
+
+# Pytest
+.pytest_cache/
+
+# PyQt
+*.ui
+*.qrc
+
+# VSCode
+.vscode/
