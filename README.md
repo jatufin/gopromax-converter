@@ -1,15 +1,11 @@
 # GoPro MAX Converter Frontend
 
-Convert native files into other file formats to be used in
-different platforms, such as VR headsets and video streaming
-services.
+Convert native GoProMAX 360 files into standard MP4 files to be used in different platforms, such as VR headsets and video streaming services.
 
 
 ### Acknowledgements
 
-The current version of FFmpeg doesn't natively support GoPro's `360` file format. A fork from a previous version
-with GoProMAX filter is used. Big thanks to people who
-have done great job:
+The current version of FFmpeg doesn't natively support GoPro's `360` file format. A fork from a previous version with GoProMAX filter is used. Big thanks to people who have done great job:
 
 - David G. of Treckview: [Using ffmpeg to Process Raw GoPro MAX .360's into Equirectangular Projections](https://www.trekview.org/blog/using-ffmpeg-process-gopro-max-360/)
 - `gmat`'s goproMax-FFmpeg-v5 FFMpeg fork:
@@ -17,15 +13,7 @@ have done great job:
 - `zepadovani`'s GPU enabled Dockerfile:
 [https://github.com/zepadovani/docker_goproMax-ffmpeg-v5/tree/main]
 
-## Motivation
-
-- The GoproPlayer native application can convert videos to
-mp4 formats, but the resolution decreases from 5.7k to 4k
-- The Player converts a single `.360` file as whole, and doesn't
-allow cutting the file, or concatenating multiple files into one
-- GoPo Player is not supported in Linux
-
-## Aim
+## Target
 
 - Application that can be run on desktop linux
 - GPU support
@@ -44,7 +32,7 @@ allow cutting the file, or concatenating multiple files into one
 
 The project is currently in very early phase:
 - The correct FFmpeg binary can be built using Docker
-- NVIDIA GPU support
+- NVIDIA GPUs are supported
 - Simple conversion with CLI works
 
 # Compiling FFmpeg in a Docker container
@@ -128,24 +116,12 @@ sudo usermod -aG docker $USER
 docker run --gpus device=0 gopro-ffmpeg -version
 ```
 
-Testing the `.360 -> .mp4` conversion in the project root:
+## Running the app
 
-```
-docker run --gpus device=0 \
-gopro-ffmpeg -hwaccel opencl -v verbose \
--i ./data/GS010454.360 \
--filter_complex \
-'[0:0]format=yuv420p,hwupload[a] , [0:5]format=yuv420p,hwupload[b], [a][b]gopromax_opencl, hwdownload,format=yuv420p' \ 
--c:v libx264 -pix_fmt yuv420p -map_metadata 0 -map 0:a -map 0:3 \
-output_movie.mp4
-```
+### Converting a single file using command line
 
-
-## Running the app (TODO: Not implemented)
-
-### Launching the app
-
-In the project root:
+After building the FFmpeg container the conversion
+should work by running in the project root:
 
 ```
 ./scripts/convert.sh infile.360 outfile.mp4
