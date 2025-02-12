@@ -3,9 +3,6 @@ __pycache__/
 *.py[cod]
 *\$py.class
 
-# Data directory
-data/
-
 # Environmental variables for development
 .env
 
@@ -18,3 +15,12 @@ data/
 
 # VSCode
 .vscode/
+
+# FFMpeg repository
+ffmpeg/
+
+# Local dependecies
+deps/
+
+# Data directory
+data/
