@@ -1,6 +1,6 @@
 # GoPro MAX Converter Frontend
 
-Convert native GoProMAX 360 files into standard MP4 files to be used in different platforms, such as VR headsets and video streaming services.
+Convert prorietary GoProMAX 360 files into standard equirectangular MP4 files to be used in different platforms, such as VR headsets and video streaming services.
 
 
 ### Acknowledgements
@@ -13,7 +13,7 @@ The current version of FFmpeg doesn't natively support GoPro's `360` file format
 - `zepadovani`'s GPU enabled Dockerfile:
 [https://github.com/zepadovani/docker_goproMax-ffmpeg-v5/tree/main]
 
-## Target
+## Goals
 
 - Application that can be run on desktop linux
 - GPU support
@@ -30,19 +30,38 @@ The current version of FFmpeg doesn't natively support GoPro's `360` file format
 
 ## Status
 
-The project is currently in very early phase:
 - The correct FFmpeg binary can be built using Docker
 - NVIDIA GPUs are supported
-- Simple conversion with CLI works
+- Single file conversion with CLI works
 
-# Compiling FFmpeg in a Docker container
+## Automatically build
+
+**The script has not been tested!**
+
+In the project root, run:
+
+```
+./build_docker_ffmpeg.sh
+```
+
+## Running the app
+
+### Converting a single file using command line
+
+After building the FFmpeg container the conversion
+should work by running in the project root:
+
+```
+./scripts/convert.sh infile.360 outfile.mp4
+```
+
+## Manually build FFmpeg
 
 Debian based Linux distribution assumed.
 
-## Prerequisities
-
 Docker and NVIDIA container toolkit is needed.
-Currently only NVIDIA GPU's are supported.
+Currently only NVIDIA GPU's are supported. The
+steps are:
 
 1. Install Docker
 2. Install NVIDIA Container Toolkit
@@ -82,7 +101,7 @@ $ sudo apt install nvidia-container-toolkit
 
 ### 3. Configure Docker to use NVIDIA
 
-Configure the container runtime. This modifyis `/etc/docker/daemon.json` or creates it, if the file doesn't exist:
+Configure the container runtime. This modifies `/etc/docker/daemon.json` or creates it, if the file doesn't exist:
 ```
 sudo nvidia-ctk runtime configure --runtime=docker
 ```
@@ -97,7 +116,7 @@ sudo systemctl restart docker
 Run the script in the project root:
 
 ```
-./docker_build_ffmpeg.sh
+docker build -t gopro-ffmpeg .
 ```
 
 **ERROR: Permission denied**
@@ -110,21 +129,17 @@ the group: (you must relogin to the system)
 sudo usermod -aG docker $USER
 ```
 
+If you don't want to logout and login, you can temporarily activate
+the group for the current shell after the above command:
+
+```
+newgrp docker
+```
+
 ### 5. Test the FFmpeg binary
 
 ```
 docker run --gpus device=0 gopro-ffmpeg -version
-```
-
-## Running the app
-
-### Converting a single file using command line
-
-After building the FFmpeg container the conversion
-should work by running in the project root:
-
-```
-./scripts/convert.sh infile.360 outfile.mp4
 ```
 
 ## Notes
