@@ -33,7 +33,7 @@ def ffmpeg_convert(input_file, output_file=None):
         "docker", "run", "--gpus", "device=0",
             "-v", f"{input_dir}:/input" ,
             "-v", f"{output_dir}:/output",
-        "gopro-ffmpeg","-hwaccel", "opencl", "-v", "verbose",
+        "gopro-ffmpeg", "-hwaccel", "opencl", "-v", "verbose",
             "-i", f"/input/{input_filename}",
             "-c:v", "libx264",
             "-pix_fmt", "yuv420p",
@@ -52,12 +52,57 @@ def ffmpeg_convert(input_file, output_file=None):
 
     return output_file
 
-def ffmpeg_concatenate(file_list, output_file): # TODO: Implement
+def ffmpeg_concatenate(file_list, output_file): # TODO: Test
     """ Concatenates file_list files into one output_file
-    MP4 file format is assumed
-    """
+    MP4 file format is assumed.
 
-    print("Concatenation has not been implemented")
+    Returns output file name if succesfull
+    """
+    if len(file_list) == 0:
+        print("File list is empty")
+        return
+
+    input_dir = os.path.dirname(os.path.abspath(file_list[0]))
+
+    concat_file = f"{input_dir}/concat.txt"
+
+    with open(concat_file, "w") as f:
+        for filename in file_list:
+            dir = os.path.dirname(os.path.abspath(filename))
+            if dir != input_dir:
+                print("All input files much reside in the same directory")
+                os.remove(concat_file)
+                return
+
+            f.write(f"file: '{os.path.basename(filename)}'")
+
+    output_dir = os.path.dirname(os.path.abspath(output_file))
+    output_file = os.path.basename(output_file)
+
+    docker_command = [
+        "docker", "run", "--gpus", "device=0",
+            "-v", f"{input_dir}:/input",
+            "-v", f"{output_dir}:/output",
+        "gopro-ffmpeg", "-hwaccel", "opencl", "-v", "verbose",
+            "-i", f"/input/{concat_file}",
+            "-c", "copy",
+            "-strict", "unofficial",
+            f"/output/{output_file}"            
+    ]
+
+    try:
+        print(f"Concatenating: {concat_file} --> {output_file}...", end="")
+        subprocess.run(docker_command, check=True)
+        print("OK")
+    except subprocess.CalledProcessError as e:
+        print(f"Error during concatenation: {e}")
+        os.remove(concat_file)
+        return
+
+    os.remove(concat_file)
+    
+    return output_file
+
 
 def main():
     # Command line arguments
