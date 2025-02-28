@@ -46,13 +46,28 @@ In the project root, run:
 
 ## Running the app
 
-### Converting a single file using command line
+### Converting a single file using the shell script
 
 After building the FFmpeg container the conversion
 should work by running in the project root:
 
 ```
 ./scripts/convert.sh infile.360 outfile.mp4
+```
+
+### Concatenating mp4 files using the shell script
+
+Create the `files.txt`:
+```
+file 'file01.mp4'
+file 'file02.mp4'
+file 'file03.mp4'
+```
+
+Run from the project root:
+
+```
+./scripts/convert.sh files.txt outfile.mp4
 ```
 
 ### More advanced Python script (TODO: Not fully tested)
@@ -170,17 +185,3 @@ GoPro documentation:
 
 [https://gopro.com/en/us/news/max-tech-specs-stitching-resolution?srsltid=AfmBOopvUFb7gRgx74Uk7Rq9gQzmGIPFYdtl_4sfL8fI6HV6a_O8enwA]
 
-### Concatenation
-
-The `input.txt` file:
-```
-file 'file01.mp4'
-file 'file02.mp4'
-file 'file03.mp4'
-```
-
-Concatenate preserving the metadata:
-
-```
-ffmpeg -f concat -i input.txt -c copy -strict unofficial output.mp4
-```
