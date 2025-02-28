@@ -65,15 +65,15 @@ poetry install
 Run the converter from project root:
 
 ```
-poetry run ./scripts/convert360toMp4.py file.360
+poetry run python ./scripts/convert360toMp4.py file.360
 # --> file.mp4
-poetry run ./scripts/convert360toMp4.py infile.360 -o outfile.mp4
+poetry run python ./scripts/convert360toMp4.py infile.360 -o outfile.mp4
 # --> outfile.mp4
-poetry run ./scripts/convert360toMp4.py file1.360 file2.360 file3.360
+poetry run python ./scripts/convert360toMp4.py file1.360 file2.360 file3.360
 # --> file1.mp4, file2.mp4, file3.mp4
+poetry run python ./scripts/convert360toMp4.py file1.360 file2.360 file3.360 -o cat_file.mp4
+# --> cat_file.mp4
 ```
-
-Creates file.mp4
 
 ## Manually build FFmpeg
 
