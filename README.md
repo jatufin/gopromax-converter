@@ -70,7 +70,7 @@ Run from the project root:
 ./scripts/convert.sh files.txt outfile.mp4
 ```
 
-### More advanced Python script (TODO: Not fully tested)
+### More advanced Python script
 
 Initialize Python environment:
 ```

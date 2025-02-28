@@ -2,6 +2,9 @@ import argparse
 import os
 import subprocess
 
+CONCAT_FILE = "concat.txt"
+CONCAT_FILE_COMMENT = "# This is a temporary file and can be deleted"
+
 def validate_filetype(file_list, extension):
     """ Validate that the files have given extension.
     """
@@ -27,6 +30,7 @@ def ffmpeg_convert(input_file, output_file=None):
     output_dir = os.path.dirname(os.path.abspath(output_file))
     output_filename = os.path.basename(output_file)
 
+    # TODO: Remove debug
     print(f"Input dir: {input_dir} Filename: {input_filename}")
     
     docker_command = [
@@ -65,29 +69,34 @@ def ffmpeg_concatenate(file_list, output_file): # TODO: Test
     input_dir = os.path.dirname(os.path.abspath(file_list[0]))
 
     concat_file = f"{input_dir}/concat.txt"
-
+        
     with open(concat_file, "w") as f:
         for filename in file_list:
             dir = os.path.dirname(os.path.abspath(filename))
+        
             if dir != input_dir:
-                print("All input files much reside in the same directory")
-                os.remove(concat_file)
+                print("Files must be in the same directory")
                 return
 
-            f.write(f"file: '{os.path.basename(filename)}'")
+            line = f"file '{os.path.basename(filename)}'\n"
+            f.write(line)
+
+    input_dir = os.path.dirname(os.path.abspath(concat_file))
+    input_filename = os.path.basename(concat_file)
 
     output_dir = os.path.dirname(os.path.abspath(output_file))
-    output_file = os.path.basename(output_file)
+    output_filename = os.path.basename(output_file)
 
     docker_command = [
         "docker", "run", "--gpus", "device=0",
             "-v", f"{input_dir}:/input",
             "-v", f"{output_dir}:/output",
         "gopro-ffmpeg", "-hwaccel", "opencl", "-v", "verbose",
-            "-i", f"/input/{concat_file}",
+            "-f", "concat",
+            "-i", f"/input/{input_filename}",
             "-c", "copy",
             "-strict", "unofficial",
-            f"/output/{output_file}"            
+            f"/output/{output_filename}"            
     ]
 
     try:
@@ -96,10 +105,12 @@ def ffmpeg_concatenate(file_list, output_file): # TODO: Test
         print("OK")
     except subprocess.CalledProcessError as e:
         print(f"Error during concatenation: {e}")
-        os.remove(concat_file)
+        # TODO: activate cleanup
+        #os.remove(concat_file)
         return
 
-    os.remove(concat_file)
+    # TODO: activate cleanup
+    #os.remove(concat_file)
     
     return output_file
 
@@ -141,7 +152,7 @@ def main():
         parser.error("Input files should have .360 extension")
 
     if args.output:
-        output_file = output_file if validate_filetype(output_file, "mp4") \
+        output_file = args.output if validate_filetype(args.output, "mp4") \
             else f"{args.output}.mp4"
     else:
         output_file = None
@@ -151,8 +162,8 @@ def main():
     else:
         converted_files = []
         for input_file in input_files:
-            output_file = ffmpeg_convert(input_file)
-            converted_files.append(output_file)
+            mp4_file = ffmpeg_convert(input_file)
+            converted_files.append(mp4_file)
 
         ffmpeg_concatenate(converted_files, output_file)
 
