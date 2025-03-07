@@ -24,3 +24,7 @@ deps/
 
 # Data directory
 data/
+
+# Video files
+*.360
+*.mp4
